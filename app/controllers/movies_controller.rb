@@ -61,11 +61,12 @@ class MoviesController < ApplicationController
   end
 
   def same_director
-    @movie = Movie.find params[:id]
-    if @movie.director and !@movie.director.empty?
-      @movies = Movie.find_all_by_director(@movie.director)
-    else
-      flash[:notice] = "'#{@movie.title}' has no director info."
+    id = params[:id]
+    @movie = Movie.find(id)
+    begin
+      @movies = Movie.find_same_director(id)
+    rescue Movie::NoDirectorInfo => exception
+      flash[:warning] = "'#{@movie.title}' has no director info."
       redirect_to movies_path
     end
   end
