@@ -48,7 +48,7 @@ describe MoviesController do
     it 'should create a movie successfully' do
       movie = mock('Movie', :title => 'The Help')
       Movie.should_receive(:create!).and_return(movie)
-      get :create, :movie => movie
+      post :create, :movie => movie
       response.should redirect_to(movies_path)
     end
   end
@@ -57,18 +57,28 @@ describe MoviesController do
     it 'should show the form to edit the movie information' do
       movie = mock('Movie', :title => 'The Help')
       Movie.should_receive(:find).with('1').and_return(movie)
-      get :edit, {:id => '1'}
+      get :edit, :id => '1'
       response.should render_template('edit')
     end
   end
 
   describe 'update a movie' do
     it 'should save the updated movie information' do
-      movie = mock('Movie', :title => 'The Help')
+      movie = mock('Movie', :id => '1', :title => 'The Help')
       Movie.should_receive(:find).with('1').and_return(movie)
-      Movie.should_receive(:update_attributes!)
-      #get :update, {:movie => movie}
-      #response.should redirect_to(movie_path, :id => '1')
+      movie.should_receive(:update_attributes!)
+      put :update, :id => '1', :movie => movie
+      response.should redirect_to movie_path(movie)
+    end
+  end
+
+  describe 'delete a movie' do
+    it 'should delete the movie' do
+      movie = mock('Movie', :id => '1', :title => 'The Help')
+      Movie.should_receive(:find).with('1').and_return(movie)
+      movie.should_receive(:destroy)
+      delete :destroy, :id => '1'
+      response.should redirect_to(movies_path)
     end
   end
 
